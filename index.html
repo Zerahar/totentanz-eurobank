@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+</head>
+<link rel="stylesheet" href="style.css">
+<script src="jquery.min.js"></script>
+<script src="jquery-validate.min.js"></script>
+<script src="script.js"></script>
+
+
+<meta charset="UTF-8">
+
+<body>
+    <div id="All">
+        <h1>Totentanz</h1>
+        <div id="LoginContainer">
+            <label>Salasana: <input type="text" id="Password" /></label>
+            <button type="button" id="LoginButton">Kirjaudu sisään</button>
+        </div>
+        <button type="button" id="LogoutButton" style="display:none;">Kirjaudu ulos</button>
+
+        <div id="LoggedView" style="display:none;">
+            <h2>Tervetuloa <span id="LoggedName"></span></h2>
+            <div id="HackWarning" style="display:none;">Varoitus! Tililläsi on ollut epäilyttävää toimintaa.
+                <span id="HackSource" style="display:none;">Hakkeri <span id="HackerName"></span> on murtautunut
+                    tilillesi.</span>
+            </div>
+            <div id="CurrentCreditRow">Rahaa tilillä: <span id="CurrentCredit"></span></div>
+            <div id="PlayerList"></div>
+            <div id="AddUserContainer">
+                <button type="button" id="ShowAddUser">Lisää hahmo</button>
+                <form id="AddUserInputContainer" style="display:none;">
+                    <div>
+                        <label>Käyttäjänimi</label>
+                        <input type="text" id="NewUserName" minlength="2" required />
+                    </div>
+                    <div>
+                        <label>Salasana (väh. 5 merkkiä)</label>
+                        <input type="text" id="NewUserPassword" minlength="5" required />
+                    </div>
+                    <div>
+                        <div class="inner-input-container">
+                            <label>Kuinka helppo hakkerointikohde hahmo on?</label>
+                            <span>(0 = mahdoton, 100 = onnistuu aina)</span>
+                        </div>
+                        <input type="number" id="NewUserHackChance" min="0" max="100" required value="50" />
+                    </div>
+                    <div>
+                        <label>Aloitusrahat</label>
+                        <input type="number" id="NewUserCredits" min="0" required value="0" />
+                    </div>
+                    <div>
+                        <label>Pystyy hakkeroida muita</label>
+                        <input type="checkbox" id="NewUserIsHacker" />
+                    </div>
+                    <div>
+                        <label>On kaulus</label>
+                        <input type="checkbox" id="NewUserIsCorp" />
+                    </div>
+                    <button type="button" id="AddUserBtn">Lisää</button>
+                    <button type="button" id="EditUserBtn">Tallenna</button>
+                </form>
+            </div>
+        </div>
+        <div id="ErrorView" class="error"></div>
+        <div id="MessageView"></div>
+        <div id="PaymentBox" class="box" style="display:none;">
+            <div class="inner-box">
+                <button type="button" class="close-btn">X</button>
+                <h2>Siirrä rahaa</h2>
+                <p>Maksa henkilölle <span id="PaymentTarget"></span></p>
+                <input type="number" id="PaymentAmount" min="1" />
+                <button type="button" id="PayButton">Maksa</button>
+                <div id="PaymentError" class="error"></div>
+                <div id="PaymentMessage"></div>
+            </div>
+        </div>
+        <div id="HackBox" class="box" style="display:none;">
+            <div class="inner-box">
+                <button type="button" class="close-btn">X</button>
+                <h2>Hakkeroi</h2>
+                <p>Yritä hakkeroida <span id="HackTarget"></span></p>
+                <button type="button" id="HackButton">Hakkeroi</button>
+
+                <div id="HackSuccess" style="display: none;">Hakkerointi onnistui, sait saaliiksi <span
+                        id="HackAmount"></span> eurodollaria</div>
+                <div id="HackFailure" class="error" style="display: none;">Hakkerointi epäonnistui</div>
+            </div>
+        </div>
+        <div id="DeleteBox" class="box" style="display:none;">
+            <div class="inner-box">
+                <button type="button" class="close-btn">X</button>
+                <h2>Poista</h2>
+                <p>Haluatko poistaa käyttäjän <span id="DeleteTarget"></span>?</p>
+                <button type="button" id="DeleteButton">Poista</button>
+            </div>
+        </div>
+        <div id="Loader" style="display: none;">
+            <div class="loader"></div>
+        </div>
+    </div>
+</body>
+
+</html>
