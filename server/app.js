@@ -1,9 +1,13 @@
 const mysql = require('mysql');
-const connection = mysql.createConnection(process.env.DB_URI);
+const pool = mysql.createPool({
+    uri: process.env.DB_URI,
+    connectionLimit: 5,      // max simultaneous connections
+    waitForConnections: true, // queue queries when pool is full
+    queueLimit: 0             // unlimited queue (set a number to cap it)
+});
 
 const express = require('express')
 const bodyParser = require('body-parser')
-const port = 3000
 const app = express()
 
 // CORS
@@ -17,14 +21,6 @@ app.use((req, res, next) => {
 // create application/json parser
 const jsonParser = bodyParser.json()
 
-// create application/x-www-form-urlencoded parser
-const urlencodedParser = bodyParser.urlencoded()
-
-connection.connect((err) => {
-    if (err) throw err;
-    console.log('Connected!');
-});
-
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
@@ -36,7 +32,7 @@ app.listen(3000, '0.0.0.0', () => {
 // Create user
 app.post('/new', jsonParser, function (req, res) {
     console.log("Trying to create a new user " + req.body.username);
-    connection.query(`INSERT INTO users (name, password, credits, hack_chance, is_hacker, is_corp) VALUES ('${req.body.username}', '${req.body.password}', '${req.body.credits}', '${req.body.hack_chance}', '${req.body.is_hacker == true ? 1 : 0}', '${req.body.is_corp == true ? 1 : 0}')`, (err, rows) => {
+    pool.query(`INSERT INTO users (name, password, credits, hack_chance, is_hacker, is_corp) VALUES ('${req.body.username}', '${req.body.password}', '${req.body.credits}', '${req.body.hack_chance}', '${req.body.is_hacker == true ? 1 : 0}', '${req.body.is_corp == true ? 1 : 0}')`, (err, rows) => {
         if (err) {
             res.status(err.errno == 1062 ? 409 : 500);
             console.log("Error in creating a user: ", err.sqlMessage);
@@ -51,7 +47,7 @@ app.post('/new', jsonParser, function (req, res) {
 // Edit user
 app.post('/edit', jsonParser, function (req, res) {
     console.log("Trying to edit user ", req.body.username);
-    connection.query(`UPDATE users SET name = '${req.body.username}', password = '${req.body.password}', credits = '${req.body.credits}', hack_chance = '${req.body.hack_chance}', is_hacker = '${req.body.is_hacker == true ? 1 : 0}', is_corp ='${req.body.is_corp == true ? 1 : 0}' WHERE name = '${req.body.old_name}'`, (err, rows) => {
+    pool.query(`UPDATE users SET name = '${req.body.username}', password = '${req.body.password}', credits = '${req.body.credits}', hack_chance = '${req.body.hack_chance}', is_hacker = '${req.body.is_hacker == true ? 1 : 0}', is_corp ='${req.body.is_corp == true ? 1 : 0}' WHERE name = '${req.body.old_name}'`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in creating a user: ", err.sqlMessage);
@@ -66,7 +62,7 @@ app.post('/edit', jsonParser, function (req, res) {
 // Pay to user
 app.get('/pay/:user/:amount/:from', (req, res) => {
     console.log(`Trying to pay ${req.params.amount} credits to user ${req.params.user} from user ${req.params.from}`);
-    connection.query(`UPDATE users SET credits = credits +${req.params.amount} WHERE NAME = '${req.params.user}'`, (err, rows) => {
+    pool.query(`UPDATE users SET credits = credits +${req.params.amount} WHERE NAME = '${req.params.user}'`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in payment: ", err.sqlMessage);
@@ -74,14 +70,14 @@ app.get('/pay/:user/:amount/:from', (req, res) => {
             return;
         }
         if (req.params.from != "admin") {
-            connection.query(`UPDATE users SET credits = credits -${req.params.amount} WHERE NAME = '${req.params.from}'`, (err, rows) => {
+            pool.query(`UPDATE users SET credits = credits -${req.params.amount} WHERE NAME = '${req.params.from}'`, (err, rows) => {
                 if (err) {
                     res.status(500);
                     console.log("Error in payment: ", err.sqlMessage);
                     res.send(err.sqlMessage);
                     return;
                 }
-                connection.query(`SELECT name, credits FROM users WHERE NAME = '${req.params.user}' OR NAME = '${req.params.from}'`, (err, rows) => {
+                pool.query(`SELECT name, credits FROM users WHERE NAME = '${req.params.user}' OR NAME = '${req.params.from}'`, (err, rows) => {
                     if (err) {
                         res.status(500);
                         console.log("Error in payment: ", err.sqlMessage);
@@ -93,7 +89,7 @@ app.get('/pay/:user/:amount/:from', (req, res) => {
                 });
             });
         } else {
-            connection.query(`SELECT name, credits FROM users WHERE NAME = '${req.params.user}'`, (err, rows) => {
+            pool.query(`SELECT name, credits FROM users WHERE NAME = '${req.params.user}'`, (err, rows) => {
                 if (err) {
                     res.status(500);
                     console.log("Error in payment: ", err.sqlMessage);
@@ -111,7 +107,7 @@ app.get('/pay/:user/:amount/:from', (req, res) => {
 app.get('/hack/:target/:hacker', (req, res) => {
     console.log(`User ${req.params.hacker} is trying to hack user ${req.params.target}`);
     // Get chance
-    connection.query(`SELECT hack_chance, credits FROM users WHERE NAME = '${req.params.target}'`, (err, rows) => {
+    pool.query(`SELECT hack_chance, credits FROM users WHERE NAME = '${req.params.target}'`, (err, rows) => {
         if (err) {
             res.status(500);
             res.send(err.sqlMessage);
@@ -125,8 +121,8 @@ app.get('/hack/:target/:hacker', (req, res) => {
         if (success) {
             // Steal 30% of money
             stolenAmount = Math.floor(rows[0].credits * 0.3);
-            connection.query(`UPDATE users SET credits = (credits - ${stolenAmount}) WHERE NAME = '${req.params.target}'`);
-            connection.query(`UPDATE users SET credits = (credits + ${stolenAmount}) WHERE NAME = '${req.params.hacker}'`);
+            pool.query(`UPDATE users SET credits = (credits - ${stolenAmount}) WHERE NAME = '${req.params.target}'`);
+            pool.query(`UPDATE users SET credits = (credits + ${stolenAmount}) WHERE NAME = '${req.params.hacker}'`);
             if (err) {
                 res.status(500);
                 console.log("Error in hacking: ", err.sqlMessage);
@@ -135,7 +131,7 @@ app.get('/hack/:target/:hacker', (req, res) => {
             }
         }
         // Activate cooldown
-        connection.query(`UPDATE users SET hack_cooldown = NOW() WHERE NAME = '${req.params.hacker}'`);
+        pool.query(`UPDATE users SET hack_cooldown = NOW() WHERE NAME = '${req.params.hacker}'`);
         if (err) {
             res.status(500);
             console.log("Error in hacking: ", err.sqlMessage);
@@ -144,7 +140,7 @@ app.get('/hack/:target/:hacker', (req, res) => {
         }
 
         // Change latest hacked timestamp
-        connection.query(`UPDATE users SET last_hacked = NOW() WHERE NAME = '${req.params.target}'`);
+        pool.query(`UPDATE users SET last_hacked = NOW() WHERE NAME = '${req.params.target}'`);
         if (err) {
             res.status(500);
             console.log("Error in hacking: ", err.sqlMessage);
@@ -154,7 +150,7 @@ app.get('/hack/:target/:hacker', (req, res) => {
 
         // Save hacker name
         if (!success) {
-            connection.query(`UPDATE users SET last_hacker = '${req.params.hacker}' WHERE NAME = '${req.params.target}'`);
+            pool.query(`UPDATE users SET last_hacker = '${req.params.hacker}' WHERE NAME = '${req.params.target}'`);
             if (err) {
                 res.status(500);
                 console.log("Error in hacking: ", err.sqlMessage);
@@ -171,7 +167,7 @@ app.get('/hack/:target/:hacker', (req, res) => {
 // User login
 app.get('/login/:password', (req, res) => {
     console.log(`Trying to log in with a password ${req.params.password}`);
-    connection.query('SELECT * FROM users', (err, rows) => {
+    pool.query('SELECT * FROM users', (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in login: ", err.sqlMessage);
@@ -208,7 +204,7 @@ app.get('/login/:password', (req, res) => {
 // User delete
 app.get('/delete/:username', (req, res) => {
     console.log("Trying to remove user ", req.params.username);
-    connection.query(`DELETE FROM users WHERE name = '${req.params.username}'`, (err, rows) => {
+    pool.query(`DELETE FROM users WHERE name = '${req.params.username}'`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in removal: ", err.sqlMessage);
@@ -224,7 +220,7 @@ app.get('/delete/:username', (req, res) => {
 // User reset
 app.get('/reset/:username', (req, res) => {
     console.log("Trying to reset timers for user ", req.params.username);
-    connection.query(`UPDATE users SET hack_cooldown = NULL, last_hacked = NULL, last_hacker = NULL WHERE name = '${req.params.username}'`, (err, rows) => {
+    pool.query(`UPDATE users SET hack_cooldown = NULL, last_hacked = NULL, last_hacker = NULL WHERE name = '${req.params.username}'`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in user reset: ", err.sqlMessage);
@@ -239,7 +235,7 @@ app.get('/reset/:username', (req, res) => {
 // User list
 app.get('/users/:username', (req, res) => {
     console.log("Listing users for user ", req.params.username);
-    connection.query(`SELECT * FROM users WHERE is_admin = 0 AND name != '${req.params.username}'`, (err, rows) => {
+    pool.query(`SELECT * FROM users WHERE is_admin = 0 AND name != '${req.params.username}'`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in user listing: ", err.sqlMessage);
@@ -254,7 +250,7 @@ app.get('/users/:username', (req, res) => {
 })
 // Auto update
 app.get('/status/:username', (req, res) => {
-    connection.query(`SELECT * FROM users WHERE is_admin = 0`, (err, rows) => {
+    pool.query(`SELECT * FROM users WHERE is_admin = 0`, (err, rows) => {
         if (err) {
             res.status(500);
             console.log("Error in user refresh: ", err.sqlMessage);
