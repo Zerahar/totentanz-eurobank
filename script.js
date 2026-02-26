@@ -20,6 +20,9 @@ $(function () {
     $("#PayButton").on("click", pay);
     $("#HackButton").on("click", hack);
     $("#LoginButton").on("click", login);
+    $('#Password').on('keydown', e => {
+        if (e.keyCode == 13) login();
+    })
     $("#LogoutButton").on("click", logout);
     $("#DeleteButton").on("click", deleteUser);
     $("#ShowAddUser").on("click", showAddUser);
@@ -35,6 +38,7 @@ $(function () {
             if (!response.ok) {
                 console.log(`Response status: ${response.status}`);
                 showError("Kirjautuminen epäonnistui");
+                $('#Loader').hide();
                 return;
             }
 
@@ -63,6 +67,7 @@ $(function () {
                 isAdmin = false;
                 $("#CurrentCreditRow").show();
                 $("#AddUserContainer").hide();
+                $('#EuroBank').show();
                 updateInterval = setInterval(() => {
                     getUpdate()
                 }, 15000)
@@ -73,7 +78,7 @@ $(function () {
 
             if (lastHacked) {
                 $('#HackWarning').show();
-                if (json.is_corp == 1) {
+                if (json.last_hacker && json.is_corp == 1) {
                     $('#HackSource').show();
                     $('#HackerName').text(json.last_hacker);
                 }
@@ -108,7 +113,7 @@ $(function () {
     function logout() {
         clearError();
         $("#LoginContainer, #CurrentCreditRow").show();
-        $("#LogoutButton,#LoggedView,#AddUserContainer,#AddUserInputContainer,#HackWarning,#HackSource").hide();
+        $("#LogoutButton,#LoggedView,#AddUserContainer,#AddUserInputContainer,#HackWarning,#HackSource, #EuroBank").hide();
         $("#CurrentCredit,#HackerName,#LoggedName").text("");
         $list.empty();
         $paymentBox.hide();
@@ -457,7 +462,8 @@ $(function () {
         try {
             const response = await fetch(serverUrl + "reset/" + target);
             if (!response.ok) showError("Käyttäjän nollaus epäonnistui");
-            else showMessage("Käyttäjän nollaus onnistui")
+            else showMessage("Käyttäjän nollaus onnistui");
+            getUsers();
             $("#Loader").hide();
         } catch (error) {
             showError("Käyttäjän nollaus epäonnistui");
