@@ -48,6 +48,7 @@ input {
   display:flex;
   flex-direction:column;
   gap:.5em;
+  padding:0 1em 1em 1em;
 }
 .box {
     display: flex;
@@ -145,4 +146,11 @@ input {
     align-items: center;
     flex-direction: column;
     height:100%;
+}
+#LoginContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
 }
