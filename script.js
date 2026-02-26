@@ -1,6 +1,6 @@
 $(function () {
 
-    const serverUrl = "https://totentanz-eurobank.onrender.com/";
+    const serverUrl = "https://totentanz-eurobank.onrender.com:3000/";
     var currentUser;
     var userList;
     var lastHacked;
