@@ -398,6 +398,7 @@ $(function () {
     function resetEdit(e) {
         clearError();
         $("#AddUserInputContainer").hide();
+        if (isAdmin) $("#ShowAddUser").show();
     }
 
     async function editUser() {
