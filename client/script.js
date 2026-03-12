@@ -28,6 +28,7 @@ $(function () {
     $("#ShowAddUser").on("click", showAddUser);
     $('#AddUserBtn').on('click', addUser);
     $('#EditUserBtn').on('click', editUser);
+    $('#ResetEditBtn').on('click', resetEdit);
 
     async function login() {
         clearError();
@@ -103,7 +104,7 @@ $(function () {
             }
             const json = await response.json();
             userList = json;
-            generatePlayerList($("#CurrentCredit").val());
+            generatePlayerList($("#CurrentCredit").text());
         } catch (error) {
             console.error(error.message);
             showError("Käyttäjien haku epäonnistui");
@@ -230,7 +231,7 @@ $(function () {
         } else if (action == "hack") {
             $box = $hackBox;
             $("#HackTarget").html(target);
-            $('#HackBtn').prop('disabled', false)
+            $('#HackButton').prop('disabled', false)
         } else if (action == "delete") {
             $box = $deleteBox;
             $("#DeleteTarget").html(target)
@@ -313,7 +314,7 @@ $(function () {
                 $("#Loader").hide();
                 $("#HackSuccess").toggle(json.status);
                 $("#HackFailure").toggle(!json.status);
-                $('#HackBtn').prop('disabled', true);
+                $('#HackButton').prop('disabled', true);
                 $('.hack-btn').prop('disabled', true);
                 if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
             } catch (e) {
@@ -392,6 +393,11 @@ $(function () {
         $("#ShowAddUser, #AddUserBtn").hide();
         $("#AddUserInputContainer, #EditUserBtn").show();
         $('#EditUserBtn').attr('data-name', username);
+    }
+
+    function resetEdit(e) {
+        clearError();
+        $("#AddUserInputContainer").hide();
     }
 
     async function editUser() {

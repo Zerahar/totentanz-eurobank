@@ -130,14 +130,7 @@ app.get('/hack/:target/:hacker', async (req, res) => {
         }
 
         await conn.query(`UPDATE users SET hack_cooldown = NOW() WHERE name = ?`, [hacker]);
-        await conn.query(`UPDATE users SET last_hacked = NOW() WHERE name = ?`, [target]);
-
-        if (!success) {
-            await conn.query(
-                `UPDATE users SET last_hacker = ? WHERE name = ?`,
-                [hacker, target]
-            );
-        }
+        await conn.query(`UPDATE users SET last_hacked = NOW(), last_hacker = ? WHERE name = ?`, [hacker, target]);
 
         await conn.commit();
 
