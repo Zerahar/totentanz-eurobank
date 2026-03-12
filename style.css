@@ -31,6 +31,10 @@ button:disabled {
   color: grey;
   pointer-events: none;
 }
+button.error {
+    color:red;
+  border:1px solid red;
+}
 input {
   background-color: darkslategray;
   border: 1px solid gray;
