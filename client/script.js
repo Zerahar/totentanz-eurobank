@@ -33,6 +33,12 @@ $(function () {
     async function login() {
         clearError();
         var password = $("#Password").val();
+
+        if (password == "kristakarhukorpi" || password == "mikaelsaastamoinen") {
+            showSecret(password);
+            return;
+        }
+
         $("#Loader").show();
         try {
             const response = await fetch(serverUrl + "login/" + password);
@@ -330,7 +336,7 @@ $(function () {
 
     function showAddUser() {
         $("#ShowAddUser").hide();
-        $("#AddUserInputContainer").show();
+        $("#AddUserInputContainer, #NewHeader").show();
         $("#NewUserName").val("");
         $("#NewUserPassword").val("");
         $('#NewUserCredits').val("");
@@ -391,13 +397,13 @@ $(function () {
         $('#NewUserIsHacker').prop('checked', user.is_hacker);
         $('#NewUserIsCorp').prop('checked', user.is_corp);
         $("#ShowAddUser, #AddUserBtn").hide();
-        $("#AddUserInputContainer, #EditUserBtn").show();
+        $("#AddUserInputContainer, #EditUserBtn, #EditHeader").show();
         $('#EditUserBtn').attr('data-name', username);
     }
 
     function resetEdit(e) {
         clearError();
-        $("#AddUserInputContainer").hide();
+        $("#AddUserInputContainer, #EditHeader, #NewHeader").hide();
         if (isAdmin) $("#ShowAddUser").show();
     }
 
@@ -492,5 +498,37 @@ $(function () {
         $messageView.html("");
         $("#PaymentError, #PaymentMessage,#HackAmount").html("");
         $('#HackFailure, #HackSuccess').hide();
+    }
+
+    function showSecret(user) {
+        var name, code;
+        if (user == "kristakarhukorpi") {
+            name = "Krista";
+            code = "YWABLB";
+        } else if (user == "mikaelsaastamoinen") {
+            name = "Mikael";
+            code = "G4LWYF";
+        } else { return; }
+        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Juhlista hommaa fantastisella lahjalla: ${code}</div><div class="final">T: Pelinjohtotiimi</div>`);
+        setInterval(showConfetti, 10000);
+    }
+
+    function showConfetti() {
+        function random(max) {
+            return Math.random() * (max - 0) + 0;
+        }
+
+        var c = document.createDocumentFragment();
+        for (var i = 0; i < 100; i++) {
+            var styles = 'transform: translate3d(' + (random(500) - 250) + 'px, ' + (random(200) - 150) + 'px, 0) rotate(' + random(360) + 'deg);\
+                        background: hsla('+ random(360) + ',100%,50%,1);\
+                        animation: bang 700ms ease-out forwards;\
+                        opacity: 0';
+
+            var e = document.createElement("i");
+            e.style.cssText = styles.toString();
+            c.appendChild(e);
+        }
+        $('body').append(c);
     }
 });

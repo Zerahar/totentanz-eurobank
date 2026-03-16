@@ -158,3 +158,17 @@ input {
   justify-content: center;
   gap: 1em;
 }
+#AddUserContainer {
+  border: 1px solid lime;
+  padding:1em;
+}
+#AddUserContainer h2 {
+  margin-top:0;
+}
+#FinalHeader {
+  font-size: 3em;
+  margin: 0 .5em 1em .5em;
+}
+.final {
+  margin: .5em 2em;
+}
