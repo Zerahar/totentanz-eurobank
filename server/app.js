@@ -167,7 +167,7 @@ app.get('/login/:password', async (req, res) => {
             players: rows,
             currentCredits: loggedUser.credits,
             currentUser: loggedUser.name,
-            lastHacked: loggedUser.last_hacked,
+            lastHacked: loggedUser.warning_seen === 1 ? null : loggedUser.last_hacked,
             last_hacker: loggedUser.last_hacker,
             hackCooldown: loggedUser.hack_cooldown
         };
@@ -199,7 +199,7 @@ app.get('/reset/:username', async (req, res) => {
 
     try {
         await pool.query(
-            `UPDATE users SET hack_cooldown = NULL, last_hacked = NULL, last_hacker = NULL WHERE name = ?`,
+            `UPDATE users SET hack_cooldown = NULL, last_hacked = NULL, last_hacker = NULL, warning_seen = 0 WHERE name = ?`,
             [req.params.username]
         );
         console.log("Reset successful for user ", req.params.username);
@@ -246,6 +246,23 @@ app.get('/status/:username', async (req, res) => {
         });
     } catch (err) {
         console.log("Error in user refresh: ", err);
+        res.status(500).send(err);
+    }
+});
+
+// Dismiss hack warning
+app.get('/dismissWarning/:username', async (req, res) => {
+    console.log("Trying to hack warning for user ", req.params.username);
+
+    try {
+        await pool.query(
+            `UPDATE users SET warning_seen = 1 WHERE name = ?`,
+            [req.params.username]
+        );
+        console.log("Warning dismissal successful for user ", req.params.username);
+        res.send("ok");
+    } catch (err) {
+        console.log("Error in warning dismissal: ", err);
         res.status(500).send(err);
     }
 });

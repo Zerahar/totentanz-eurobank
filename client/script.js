@@ -29,6 +29,7 @@ $(function () {
     $('#AddUserBtn').on('click', addUser);
     $('#EditUserBtn').on('click', editUser);
     $('#ResetEditBtn').on('click', resetEdit);
+    $('#DismissWarningButton').on('click', dismissHackWarning);
 
     async function login() {
         clearError();
@@ -204,7 +205,8 @@ $(function () {
                     .on("click", openBox);
                 $btnContainer.append($deleteBtn);
                 if (player.hack_cooldown) $cont.append(`<span>Viimeksi hakkeroinut ${new Date(player.hack_cooldown).toLocaleString()}</span>`);
-                if (player.last_hacked) $cont.append(`<span>Viimeksi jäänyt hakkerin ${player.last_hacker} kohteeksi ${new Date(player.last_hacked).toLocaleString()}</span>`);
+                if (player.last_hacked) $cont.append(`<span>Viimeksi jäänyt hakkerin ${player.last_hacker} kohteeksi ${new Date(player.last_hacked).toLocaleString()}. 
+                ${player.warning_seen ? "Varoitus nähty." : "Varoitus näkyvissä."}</span>`);
             }
 
             if (isHacker) {
@@ -311,7 +313,8 @@ $(function () {
     }
 
     function hack() {
-        $("#Loader").show();
+        $("#HackLoader").show();
+        $('#HackLoader > div').addClass('hack-loader');
         setTimeout(async function () {
             try {
                 const target = $('#HackTarget').text();
@@ -325,7 +328,8 @@ $(function () {
                 if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
             } catch (e) {
                 console.log(e);
-                $("#Loader").hide();
+                $("#HackLoader").hide();
+                $('#HackLoader > div').removeClass('hack-loader');
                 $("#HackSuccess").hide();
                 $("#HackFailure").show();
             }
@@ -509,7 +513,8 @@ $(function () {
             name = "Mikael";
             code = "G4LWYF";
         } else { return; }
-        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Juhlista hommaa fantastisella lahjalla: ${code}</div><div class="final">T: Pelinjohtotiimi</div>`);
+        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Juhlista hommaa fantastisella lahjalla: ${code}
+            </div><div class="final">T: Pelinjohtotiimi</div><div class="final" id="ConfettiContainer"></div>`);
         setInterval(showConfetti, 10000);
     }
 
@@ -529,6 +534,11 @@ $(function () {
             e.style.cssText = styles.toString();
             c.appendChild(e);
         }
-        $('body').append(c);
+        $('#ConfettiContainer').append(c);
+    }
+
+    function dismissHackWarning() {
+        $('#HackWarning, #HackSource').hide();
+        fetch(serverUrl + "dismissWarning/" + currentUser);
     }
 });
