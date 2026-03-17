@@ -83,7 +83,7 @@ input {
   align-items: center;
   flex-wrap:wrap;
 }
-#Loader {
+#Loader, #HackLoader {
   position: absolute;
   width:100%;
   height:100%;
@@ -204,11 +204,31 @@ input {
   height: 20px;
   width: 140px;
   background:
-   linear-gradient(#000 0 0) 0/0% no-repeat
-   lime;
+   linear-gradient(lime 0 0) 0/0% no-repeat
+   black;
   animation: l1 60s 1 linear;
   margin:1em auto;
+  border:1px solid lime;
 }
 @keyframes l1 {
     100% {background-size:100%}
+}
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+.blinking {
+  font-weight: bold;
+  font-size:1.5em;
+  color: lime;
+  animation: blink 1s infinite;
 }

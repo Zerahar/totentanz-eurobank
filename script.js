@@ -8,6 +8,7 @@ $(function () {
     var isAdmin = false;
     var isHacker = false;
     var updateInterval;
+    var hackCancelled = false;
 
     const $list = $("#PlayerList");
     const $paymentBox = $("#PaymentBox");
@@ -30,6 +31,7 @@ $(function () {
     $('#EditUserBtn').on('click', editUser);
     $('#ResetEditBtn').on('click', resetEdit);
     $('#DismissWarningButton').on('click', dismissHackWarning);
+    $('#CancelHack').on('click', cancelHack);
 
     async function login() {
         clearError();
@@ -140,7 +142,7 @@ $(function () {
         userList = json.users;
         const hackCooldown = json.hack_cooldown;
         var d = new Date();
-        d.setMinutes(d.getMinutes() - 1);
+        d.setMinutes(d.getMinutes() - 60);
         if (hackCooldown != null && new Date(Date.parse(hackCooldown)) > d) {
             $('.hack-btn').prop('disabled', true);
         } else {
@@ -316,6 +318,10 @@ $(function () {
         $("#HackLoader").show();
         $('#HackLoader > div').addClass('hack-loader');
         setTimeout(async function () {
+            if (hackCancelled) {
+                hackCancelled = false;
+                return;
+            }
             try {
                 const target = $('#HackTarget').text();
                 const response = await fetch(serverUrl + "hack/" + target + '/' + currentUser);
@@ -323,19 +329,23 @@ $(function () {
                 $("#Loader").hide();
                 $("#HackSuccess").toggle(json.status);
                 $("#HackFailure").toggle(!json.status);
-                $('#HackButton').prop('disabled', true);
-                $('.hack-btn').prop('disabled', true);
                 if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
             } catch (e) {
                 console.log(e);
                 $("#HackSuccess").hide();
                 $("#HackFailure").show();
             }
+            $('#HackButton').prop('disabled', true);
+            $('.hack-btn').prop('disabled', true);
             $("#HackLoader").hide();
             $('#HackLoader > div').removeClass('hack-loader');
-            // Update hack cooldown
-            $('.hack-btn').prop('disabled', true);
         }, 60000);
+    }
+
+    function cancelHack() {
+        hackCancelled = true;
+        $("#HackLoader").hide();
+        $('#HackLoader > div').removeClass('hack-loader');
     }
 
     function showAddUser() {
@@ -513,9 +523,9 @@ $(function () {
             name = "Mikael";
             code = "G4LWYF";
         } else { return; }
-        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Juhlista hommaa fantastisella lahjalla: ${code}
+        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Lunasta 100 ED tällä fantastisella koodilla: <span class="blinking"> ${code}</span>
             </div><div class="final">T: Pelinjohtotiimi</div><div class="final" id="ConfettiContainer"></div>`);
-        setInterval(showConfetti, 10000);
+        setInterval(showConfetti, 2000);
     }
 
     function showConfetti() {
