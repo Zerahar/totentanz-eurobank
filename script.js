@@ -328,14 +328,14 @@ $(function () {
                 if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
             } catch (e) {
                 console.log(e);
-                $("#HackLoader").hide();
-                $('#HackLoader > div').removeClass('hack-loader');
                 $("#HackSuccess").hide();
                 $("#HackFailure").show();
             }
+            $("#HackLoader").hide();
+            $('#HackLoader > div').removeClass('hack-loader');
             // Update hack cooldown
             $('.hack-btn').prop('disabled', true);
-        }, 3000);
+        }, 60000);
     }
 
     function showAddUser() {
@@ -527,7 +527,7 @@ $(function () {
         for (var i = 0; i < 100; i++) {
             var styles = 'transform: translate3d(' + (random(500) - 250) + 'px, ' + (random(200) - 150) + 'px, 0) rotate(' + random(360) + 'deg);\
                         background: hsla('+ random(360) + ',100%,50%,1);\
-                        animation: bang 700ms ease-out forwards;\
+                        animation: bang 1500ms ease-out forwards;\
                         opacity: 0';
 
             var e = document.createElement("i");
