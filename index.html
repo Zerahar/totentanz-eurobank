@@ -28,15 +28,17 @@
 
         <div id="LoggedView" style="display:none;">
             <h2>Tervetuloa <span id="LoggedName"></span></h2>
-            <div id="HackWarning" style="display:none;">Varoitus! Tililläsi on ollut epäilyttävää toimintaa.
+            <div id="HackWarning" style="display:none;">
+                <button type="button" id="DismissWarningButton" class="error">X</button>
+                Varoitus! Tililläsi on ollut epäilyttävää toimintaa.
                 <span id="HackSource" style="display:none;">Hakkeri <span id="HackerName"></span> on murtautunut
                     tilillesi.</span>
             </div>
             <div id="CurrentCreditRow">Rahaa tilillä: <span id="CurrentCredit"></span></div>
             <div id="PlayerList"></div>
             <div id="AddUserContainer">
-                <h2 id="EditHeader">Muokkaus</h2>
-                <h2 id="NewHeader">Uusi hahmo</h2>
+                <h2 id="EditHeader" style="display:none;">Muokkaus</h2>
+                <h2 id="NewHeader" style="display:none;">Uusi hahmo</h2>
                 <button type="button" id="ShowAddUser">Lisää hahmo</button>
                 <form id="AddUserInputContainer" style="display:none;">
                     <div>
@@ -109,6 +111,9 @@
         </div>
         <div id="Loader" style="display: none;">
             <div class="loader"></div>
+        </div>
+        <div id="HackLoader" style="display: none;">
+            <div></div>
         </div>
     </div>
 </body>
