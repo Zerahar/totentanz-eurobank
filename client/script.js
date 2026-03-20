@@ -231,7 +231,7 @@ $(function () {
                     .attr('data-action', 'hack')
                     .on("click", openBox);
                 var d = new Date();
-                d.setMinutes(d.getMinutes() - 1);
+                d.setMinutes(d.getMinutes() - 60);
                 if (hackCooldown != null && new Date(Date.parse(hackCooldown)) > d) {
                     $hackBtn.prop('disabled', true);
                 }
