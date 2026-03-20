@@ -241,7 +241,7 @@ app.get('/status/:username', async (req, res) => {
         res.send({
             credits: user.credits,
             hack_cooldown: user.hack_cooldown,
-            last_hacked: user.last_hacked,
+            last_hacked: user.warning_seen === 1 ? null : user.last_hacked,
             last_hacker: user.last_hacker,
             is_corp: user.is_corp,
             users: rows
