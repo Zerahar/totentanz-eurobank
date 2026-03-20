@@ -120,8 +120,8 @@ app.get('/hack/:target/:hacker', async (req, res) => {
         if (success) {
             stolenAmount = Math.floor(rows[0].credits * 0.3);
             await conn.query(
-                `UPDATE users SET credits = credits - ? WHERE name = ?`,
-                [stolenAmount, target]
+                `UPDATE users SET credits = credits - ?, last_hacked = NOW(), last_hacker = ?, warning_seen = 0  WHERE name = ?`,
+                [stolenAmount, hacker, target]
             );
             await conn.query(
                 `UPDATE users SET credits = credits + ? WHERE name = ?`,
@@ -130,7 +130,6 @@ app.get('/hack/:target/:hacker', async (req, res) => {
         }
 
         await conn.query(`UPDATE users SET hack_cooldown = NOW() WHERE name = ?`, [hacker]);
-        await conn.query(`UPDATE users SET last_hacked = NOW(), last_hacker = ? WHERE name = ?`, [hacker, target]);
 
         await conn.commit();
 
