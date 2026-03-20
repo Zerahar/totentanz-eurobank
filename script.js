@@ -150,11 +150,21 @@ $(function () {
         } else {
             $('.hack-btn').prop('disabled', false);
         }
+
         const credits = json.credits;
         if (credits < 1) {
             $('.pay-btn').prop('disabled', true);
         } else {
             $('.pay-btn').prop('disabled', false);
+        }
+        $("#CurrentCredit").html(credits);
+
+        if (json.last_hacked) {
+            $('#HackWarning').show();
+            if (json.last_hacker && json.is_corp == 1) {
+                $('#HackSource').show();
+                $('#HackerName').text(json.last_hacker);
+            }
         }
     }
 
