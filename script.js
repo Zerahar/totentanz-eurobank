@@ -1,6 +1,8 @@
 $(function () {
 
     const serverUrl = "https://totentanz-eurobank.onrender.com/";
+    const paymentSound = new Audio("coin.mp3");
+    const victorySound = new Audio("success.wav");
     var currentUser;
     var userList;
     var lastHacked;
@@ -306,7 +308,7 @@ $(function () {
                 $("#PaymentMessage").html("Maksu suoritettu");
                 generatePlayerList(1);
             }
-            console.log(json);
+            paymentSound.play();
             $('#Loader').hide();
         } catch (error) {
             console.error(error.message);
@@ -525,6 +527,7 @@ $(function () {
         } else { return; }
         $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Lunasta 100 ED tällä fantastisella koodilla: <span class="blinking"> ${code}</span>
             </div><div class="final">T: Pelinjohtotiimi</div><div class="final" id="ConfettiContainer"></div>`);
+        victorySound.play();
         setInterval(showConfetti, 2000);
     }
 
