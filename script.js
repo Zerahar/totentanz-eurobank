@@ -40,7 +40,7 @@ $(function () {
     async function testShutdown() {
         const response = await fetch(serverUrl + "shutdownquery");
         var result = await response.json();
-        shutdownUIChanges(result.value == "true")
+        shutdownUIChanges(result)
     }
 
     async function setShutdown(e) {
