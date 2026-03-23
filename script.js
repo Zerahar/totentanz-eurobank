@@ -11,6 +11,7 @@ $(function () {
     var isHacker = false;
     var updateInterval;
     var hackCancelled = false;
+    var shutdownActive = false;
 
     const $list = $("#PlayerList");
     const $paymentBox = $("#PaymentBox");
@@ -34,6 +35,37 @@ $(function () {
     $('#ResetEditBtn').on('click', resetEdit);
     $('#DismissWarningButton').on('click', dismissHackWarning);
     $('#CancelHack').on('click', cancelHack);
+    $('.shutdown-button').on('click', setShutdown)
+
+    async function testShutdown() {
+        const response = await fetch(serverUrl + "shutdownquery");
+        var result = await response.text();
+        if (result === "true") {
+            // Show shutdown UI
+            $('#ShutdownContainer').show();
+            $('#NetOn').hide();
+            $('#NetOff').show();
+            $('.shutdown-button.shutdown').hide();
+            $('.shutdown-button.clear-shutdown').show();
+            shutdownActive = true;
+        } else
+            shutdownActive = false;
+    }
+
+    async function setShutdown(e) {
+        const state = $(e.target).hasClass('shutdown');
+        const response = await fetch(serverUrl + "setshutdown/" + state);
+        if (!response.ok) {
+            console.log(`Response status: ${response.status}`);
+            showError("Netin kaataminen epäonnistui");
+            $('#Loader').hide();
+            return;
+        }
+        $('#NetOn').toggle(!state);
+        $('#NetOff').toggle(state);
+        $('.shutdown-button.shutdown').toggle(!state);
+        $('.shutdown-button.clear-shutdown').toggle(state);
+    }
 
     async function login() {
         clearError();
@@ -55,6 +87,11 @@ $(function () {
             }
 
             const json = await response.json();
+            if (json.type != "admin" && shutdownActive) {
+                showError("Internet on kaatunut");
+                $('#Loader').hide();
+                return;
+            }
             currentUser = json.currentUser;
             $("#LoginContainer").hide();
             $("#LogoutButton").show();
@@ -69,16 +106,17 @@ $(function () {
 
             if (updateInterval) clearInterval(updateInterval);
             if (json.type == "admin") {
+                $('#ShutdownContainer').hide();
                 isAdmin = true;
                 $("#CurrentCreditRow").hide();
-                $("#AddUserContainer,#ShowAddUser").show();
+                $("#AddUserContainer,#ShowAddUser,#SetShutdownContainer").show();
                 updateInterval = setInterval(() => {
                     getUsers()
                 }, 15000)
             } else {
                 isAdmin = false;
                 $("#CurrentCreditRow").show();
-                $("#AddUserContainer").hide();
+                $("#AddUserContainer,#SetShutdownContainer").hide();
                 $('#EuroBank').show();
                 updateInterval = setInterval(() => {
                     getUpdate()
@@ -564,4 +602,6 @@ $(function () {
         $('#HackWarning, #HackSource').hide();
         fetch(serverUrl + "dismissWarning/" + currentUser);
     }
+
+    testShutdown();
 });
