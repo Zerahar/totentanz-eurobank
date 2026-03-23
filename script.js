@@ -239,6 +239,7 @@ $(function () {
             $btnContainer.append($payBtn);
 
             if (isAdmin) {
+                $list.addClass('admin-list');
                 const $editBtn = $("<button>")
                     .addClass("edit-btn")
                     .text("Muokkaa")
@@ -263,6 +264,8 @@ $(function () {
                 if (player.hack_cooldown) $cont.append(`<span>Viimeksi hakkeroinut ${new Date(player.hack_cooldown).toLocaleString()}</span>`);
                 if (player.last_hacked) $cont.append(`<span>Viimeksi jäänyt hakkerin ${player.last_hacker} kohteeksi ${new Date(player.last_hacked).toLocaleString()}. 
                 ${player.warning_seen ? "Varoitus nähty." : "Varoitus näkyvissä."}</span>`);
+            } else {
+                $list.removeClass('admin-list');
             }
 
             if (isHacker) {
