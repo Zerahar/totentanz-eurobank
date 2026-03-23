@@ -238,7 +238,7 @@ app.get('/status/:username', async (req, res) => {
         }
 
         const [values] = await pool.query(`SELECT value FROM variables WHERE name = "shutdown" LIMIT 1`);
-
+        console.log("Shutdown check: ", values);
         const user = rows.splice(userIndex, 1)[0];
         res.send({
             credits: user.credits,
