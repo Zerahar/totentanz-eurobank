@@ -83,6 +83,9 @@ input {
   align-items: center;
   line-break:anywhere;
 }
+.admin-list .player-node {
+  flex-wrap:wrap;
+}
 #Loader, #HackLoader {
   position: fixed;
   width:100%;
