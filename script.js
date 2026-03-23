@@ -40,7 +40,7 @@ $(function () {
     async function testShutdown() {
         const response = await fetch(serverUrl + "shutdownquery");
         var result = await response.json();
-        shutdownUIChanges(result.value)
+        shutdownUIChanges(result.value == "true")
     }
 
     async function setShutdown(e) {
@@ -54,7 +54,7 @@ $(function () {
             return;
         }
         showMessage("Netin status muutettu!")
-        shutdownUIChanges();
+        shutdownUIChanges(state);
     }
 
     function shutdownUIChanges(state) {
