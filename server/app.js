@@ -268,3 +268,34 @@ app.get('/dismissWarning/:username', async (req, res) => {
         res.status(500).send(err);
     }
 });
+
+// Check shutdown status
+app.get('/shutdownquery', async (req, res) => {
+    console.log("Checking shutdown status");
+
+    try {
+        const [values] = await pool.query(`SELECT value FROM variables WHERE name = "shutdown" LIMIT 1`);
+        console.log("Shutdown status is ", values[0]);
+        res.send(values[0]);
+    } catch (err) {
+        console.log("Error in shutdown query: ", err);
+        res.status(500).send(err);
+    }
+});
+
+// Update shutdown status
+app.get('/setShutdown/:status', async (req, res) => {
+    console.log("Trying to set shutdown status to ", req.params.status);
+
+    try {
+        await pool.query(
+            `UPDATE variables SET value = ? WHERE name = "shutdown"`,
+            [req.params.status]
+        );
+        console.log("Shutdown status set to ", req.params.status);
+        res.send("ok");
+    } catch (err) {
+        console.log("Error in shutdown status change: ", err);
+        res.status(500).send(err);
+    }
+});
