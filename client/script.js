@@ -64,6 +64,9 @@ $(function () {
         $('.shutdown-button.clear-shutdown').toggle(state);
         $('#ShutdownContainer').toggle(!isAdmin && state);
         shutdownActive = state;
+        if (!isAdmin && state == true && currentUser != null) {
+            logout();
+        }
     }
 
     async function login() {
