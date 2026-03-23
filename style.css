@@ -236,8 +236,9 @@ input {
 #ShutdownContainer {
   line-break: anywhere;
   position: fixed;
-  opacity: 0.3;
+  opacity: 0.6;
   pointer-events: none;
+  animation: glitch 2s infinite;
   --shimmy-distance: 5;
   --clip-one: polygon(0 2%, 100% 2%, 100% 95%, 95% 95%, 95% 90%, 85% 90%, 85% 95%, 8% 95%, 0 70%);
   --clip-two: polygon(0 78%, 100% 78%, 100% 100%, 95% 100%, 95% 90%, 85% 90%, 85% 100%, 8% 100%, 0 78%);
