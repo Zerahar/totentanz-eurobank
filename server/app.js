@@ -237,6 +237,8 @@ app.get('/status/:username', async (req, res) => {
             return res.status(500).send("User not found");
         }
 
+        const [values] = await pool.query(`SELECT value FROM variables WHERE name = "shutdown" LIMIT 1`);
+
         const user = rows.splice(userIndex, 1)[0];
         res.send({
             credits: user.credits,
@@ -244,7 +246,8 @@ app.get('/status/:username', async (req, res) => {
             last_hacked: user.warning_seen === 1 ? null : user.last_hacked,
             last_hacker: user.last_hacker,
             is_corp: user.is_corp,
-            users: rows
+            users: rows,
+            shutdown_status: values[0].value
         });
     } catch (err) {
         console.log("Error in user refresh: ", err);
@@ -275,8 +278,8 @@ app.get('/shutdownquery', async (req, res) => {
 
     try {
         const [values] = await pool.query(`SELECT value FROM variables WHERE name = "shutdown" LIMIT 1`);
-        console.log("Shutdown status is ", values[0]);
-        res.send(values[0]);
+        console.log("Shutdown status is ", values[0].value);
+        res.send(values[0].value);
     } catch (err) {
         console.log("Error in shutdown query: ", err);
         res.status(500).send(err);

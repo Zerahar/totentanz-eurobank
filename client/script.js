@@ -40,31 +40,30 @@ $(function () {
     async function testShutdown() {
         const response = await fetch(serverUrl + "shutdownquery");
         var result = await response.text();
-        if (result === "true") {
-            // Show shutdown UI
-            $('#ShutdownContainer').show();
-            $('#NetOn').hide();
-            $('#NetOff').show();
-            $('.shutdown-button.shutdown').hide();
-            $('.shutdown-button.clear-shutdown').show();
-            shutdownActive = true;
-        } else
-            shutdownActive = false;
+        shutdownUIChanges(result === "true")
     }
 
     async function setShutdown(e) {
         const state = $(e.target).hasClass('shutdown');
+        $("#Loader").show();
         const response = await fetch(serverUrl + "setshutdown/" + state);
+        $('#Loader').hide();
         if (!response.ok) {
             console.log(`Response status: ${response.status}`);
-            showError("Netin kaataminen epäonnistui");
-            $('#Loader').hide();
+            showError("Netin statuksen muuttaminen epäonnistui");
             return;
         }
+        showMessage("Netin status muutettu!")
+        shutdownUIChanges();
+    }
+
+    function shutdownUIChanges(state) {
         $('#NetOn').toggle(!state);
         $('#NetOff').toggle(state);
         $('.shutdown-button.shutdown').toggle(!state);
         $('.shutdown-button.clear-shutdown').toggle(state);
+        $('#ShutdownContainer').toggle(!isAdmin && state);
+        shutdownActive = state;
     }
 
     async function login() {
