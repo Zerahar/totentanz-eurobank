@@ -171,6 +171,7 @@ $(function () {
         $paymentBox.hide();
         currentUser = null;
         if (updateInterval) clearInterval(updateInterval);
+        shutdownUIChanges(shutdownActive);
     }
 
     async function getUpdate() {
@@ -206,6 +207,7 @@ $(function () {
                 $('#HackerName').text(json.last_hacker);
             }
         }
+        shutdownUIChanges(json.shutdown_status == "true");
     }
 
     function generatePlayerList(credits) {
