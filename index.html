@@ -45,6 +45,8 @@
                 <span id="HackSource" style="display:none;">Hakkeri <span id="HackerName"></span> on murtautunut
                     tilillesi.</span>
             </div>
+            <div id="HackCooldownIndicator" style="display:none">Aikaa hakkerointiresurssien latautumiseen: <span
+                    id="HackCooldown"></span> minuuttia</div>
             <div id="CurrentCreditRow">Rahaa tilillä: <span id="CurrentCredit"></span></div>
             <div id="PlayerList"></div>
             <div id="AddUserContainer">
@@ -124,7 +126,8 @@
             <div class="loader"></div>
         </div>
         <div id="HackLoader" style="display: none;">
-            <div></div>
+            <div id="HackClock">0:<span id="Seconds">60</span></div>
+            <div id="HackProgress"></div>
             <button type="button" class="error" id="CancelHack">X</button>
         </div>
     </div>

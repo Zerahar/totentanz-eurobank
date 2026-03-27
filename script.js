@@ -10,8 +10,8 @@ $(function () {
     var isAdmin = false;
     var isHacker = false;
     var updateInterval;
-    var hackCancelled = false;
     var shutdownActive = false;
+    var clockTicking;
 
     const $list = $("#PlayerList");
     const $paymentBox = $("#PaymentBox");
@@ -134,6 +134,20 @@ $(function () {
                     $('#HackSource').show();
                     $('#HackerName').text(json.last_hacker);
                 }
+            }
+
+            if (hackCooldown != null) {
+                const oneHourLater = new Date(new Date(Date.parse(hackCooldown)).getTime() + 60 * 60 * 1000);
+                const minutesRemaining = Math.max(0, Math.ceil((oneHourLater - new Date()) / 60000));
+
+                if (minutesRemaining > 0) {
+                    $('#HackCooldownIndicator').show();
+                    $('#HackCooldown').text(minutesRemaining);
+                } else {
+                    $('#HackCooldownIndicator').hide();
+                }
+            } else {
+                $('#HackCooldownIndicator').hide();
             }
 
             $("#Loader").hide();
@@ -371,40 +385,6 @@ $(function () {
         }
     }
 
-    function hack() {
-        $("#HackLoader").show();
-        $('#HackLoader > div').addClass('hack-loader');
-        setTimeout(async function () {
-            if (hackCancelled) {
-                hackCancelled = false;
-                return;
-            }
-            try {
-                const target = $('#HackTarget').text();
-                const response = await fetch(serverUrl + "hack/" + target + '/' + currentUser);
-                const json = await response.json();
-                $("#Loader").hide();
-                $("#HackSuccess").toggle(json.status);
-                $("#HackFailure").toggle(!json.status);
-                if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
-            } catch (e) {
-                console.log(e);
-                $("#HackSuccess").hide();
-                $("#HackFailure").show();
-            }
-            $('#HackButton').prop('disabled', true);
-            $('.hack-btn').prop('disabled', true);
-            $("#HackLoader").hide();
-            $('#HackLoader > div').removeClass('hack-loader');
-        }, 60000);
-    }
-
-    function cancelHack() {
-        hackCancelled = true;
-        $("#HackLoader").hide();
-        $('#HackLoader > div').removeClass('hack-loader');
-    }
-
     function showAddUser() {
         $("#ShowAddUser").hide();
         $("#AddUserInputContainer, #NewHeader").show();
@@ -608,6 +588,52 @@ $(function () {
     function dismissHackWarning() {
         $('#HackWarning, #HackSource').hide();
         fetch(serverUrl + "dismissWarning/" + currentUser);
+    }
+
+    function hack() {
+        $("#HackLoader").show();
+        $('#HackProgress').addClass('hack-loader');
+        $('#Seconds').text(60);
+        clockTicking = setInterval(clockTick, 1000);
+    }
+
+    function cancelHack() {
+        clearInterval(clockTicking);
+        $("#HackLoader").hide();
+        $('#HackLoader > div').removeClass('hack-loader');
+    }
+
+    function clockTick() {
+        var current = $('#Seconds').text();
+        var newTick = parseInt(current)--;
+        if (newTick <= 0) {
+            // Launch hack
+            completeHack();
+        } else {
+            // Show clock
+            $('#Seconds').text(newTick);
+        }
+    }
+
+    async function completeHack() {
+        clearInterval(clockTicking);
+        try {
+            const target = $('#HackTarget').text();
+            const response = await fetch(serverUrl + "hack/" + target + '/' + currentUser);
+            const json = await response.json();
+            $("#Loader").hide();
+            $("#HackSuccess").toggle(json.status);
+            $("#HackFailure").toggle(!json.status);
+            if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
+        } catch (e) {
+            console.log(e);
+            $("#HackSuccess").hide();
+            $("#HackFailure").show();
+        }
+        $('#HackButton').prop('disabled', true);
+        $('.hack-btn').prop('disabled', true);
+        $("#HackLoader").hide();
+        $('#HackProgress').removeClass('hack-loader');
     }
 
     testShutdown();
