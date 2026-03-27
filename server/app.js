@@ -102,6 +102,17 @@ app.get('/hack/:target/:hacker', async (req, res) => {
     try {
         await conn.beginTransaction();
 
+        // Check that user is a hacker and there is no hack cooldown
+        const [hackerRows] = await conn.query(`SELECT hack_cooldown, is_hacker FROM users WHERE name = ?`, [hacker]);
+        if (hackerRows[0].is_hacker != 1) {
+            throw new Error("Hacker is not a hacker");
+        }
+        var d = new Date();
+        d.setMinutes(d.getMinutes() - 60);
+        if (hackerRows[0].hack_cooldown && new Date(Date.parse(hackCooldown)) > d) {
+            throw new Error("Hack cooldown was active, cannot hack");
+        }
+
         // Lock the target row for the duration of this transaction
         const [rows] = await conn.query(
             `SELECT hack_chance, credits FROM users WHERE name = ? FOR UPDATE`,
