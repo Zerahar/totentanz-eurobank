@@ -109,7 +109,7 @@ app.get('/hack/:target/:hacker', async (req, res) => {
         }
         var d = new Date();
         d.setMinutes(d.getMinutes() - 60);
-        if (hackerRows[0].hack_cooldown && new Date(Date.parse(hackCooldown)) > d) {
+        if (hackerRows[0].hack_cooldown != null && new Date(Date.parse(hackerRows[0].hack_cooldown)) > d) {
             throw new Error("Hack cooldown was active, cannot hack");
         }
 
@@ -249,7 +249,6 @@ app.get('/status/:username', async (req, res) => {
         }
 
         const [values] = await pool.query(`SELECT value FROM variables WHERE name = "shutdown" LIMIT 1`);
-        console.log("Shutdown check: ", values);
         const user = rows.splice(userIndex, 1)[0];
         res.send({
             credits: user.credits,

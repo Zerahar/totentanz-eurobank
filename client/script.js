@@ -619,7 +619,8 @@ $(function () {
             // Launch hack
             completeHack();
         } else {
-            // Show clock
+            // Show clock and add 0 if single digits
+            if (newTick.toString().length == 1) newTick = "0" + newTick.toString();
             $('#Seconds').text(newTick);
         }
     }
@@ -631,8 +632,8 @@ $(function () {
             const response = await fetch(serverUrl + "hack/" + target + '/' + currentUser);
             const json = await response.json();
             $("#Loader").hide();
-            $("#HackSuccess").toggle(json.status);
-            $("#HackFailure").toggle(!json.status);
+            $("#HackSuccess").toggle(json.status == true);
+            $("#HackFailure").toggle(json.status != true);
             if (!isNaN(json.amount)) $('#HackAmount').text(json.amount);
         } catch (e) {
             console.log(e);
