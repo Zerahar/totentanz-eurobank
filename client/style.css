@@ -57,7 +57,7 @@ input {
 }
 .box {
     display: flex;
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
     justify-content: center;
@@ -93,7 +93,11 @@ input {
   display:flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: brightness(50%);
+  backdrop-filter: brightness(30%);
+  top:0;
+}
+#HackClock {
+  margin-right:.5em;
 }
 
 .loader{

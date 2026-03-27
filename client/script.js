@@ -179,7 +179,7 @@ $(function () {
     function logout() {
         clearError();
         $("#LoginContainer, #CurrentCreditRow").show();
-        $("#LogoutButton,#LoggedView,#AddUserContainer,#AddUserInputContainer,#HackWarning,#HackSource, #EuroBank").hide();
+        $("#LogoutButton,#LoggedView,#AddUserContainer,#AddUserInputContainer,#HackWarning,#HackSource, #EuroBank,#HackCooldownIndicator").hide();
         $("#CurrentCredit,#HackerName,#LoggedName").text("");
         $list.empty();
         $paymentBox.hide();
@@ -198,11 +198,20 @@ $(function () {
         const json = await response.json();
         userList = json.users;
         const hackCooldown = json.hack_cooldown;
-        var d = new Date();
-        d.setMinutes(d.getMinutes() - 60);
-        if (hackCooldown != null && new Date(Date.parse(hackCooldown)) > d) {
-            $('.hack-btn').prop('disabled', true);
+        if (hackCooldown != null) {
+            const oneHourLater = new Date(new Date(Date.parse(hackCooldown)).getTime() + 60 * 60 * 1000);
+            const minutesRemaining = Math.max(0, Math.ceil((oneHourLater - new Date()) / 60000));
+
+            if (minutesRemaining > 0) {
+                $('#HackCooldownIndicator').show();
+                $('#HackCooldown').text(minutesRemaining);
+                $('.hack-btn').prop('disabled', true);
+            } else {
+                $('#HackCooldownIndicator').hide();
+                $('.hack-btn').prop('disabled', false);
+            }
         } else {
+            $('#HackCooldownIndicator').hide();
             $('.hack-btn').prop('disabled', false);
         }
 
@@ -605,7 +614,7 @@ $(function () {
 
     function clockTick() {
         var current = $('#Seconds').text();
-        var newTick = parseInt(current)--;
+        var newTick = parseInt(current) - 1;
         if (newTick <= 0) {
             // Launch hack
             completeHack();
