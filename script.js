@@ -2,7 +2,6 @@ $(function () {
 
     const serverUrl = "https://totentanz-eurobank.onrender.com/";
     const paymentSound = new Audio("coin.mp3");
-    const victorySound = new Audio("success.wav");
     var currentUser;
     var userList;
     var lastHacked;
@@ -72,11 +71,6 @@ $(function () {
     async function login() {
         clearError();
         var password = $("#Password").val();
-
-        if (password == "kristakarhukorpi" || password == "mikaelsaastamoinen") {
-            showSecret(password);
-            return;
-        }
 
         $("#Loader").show();
         try {
@@ -560,40 +554,6 @@ $(function () {
         $('#HackFailure, #HackSuccess').hide();
     }
 
-    function showSecret(user) {
-        var name, code;
-        if (user == "kristakarhukorpi") {
-            name = "Krista";
-            code = "YWABLB";
-        } else if (user == "mikaelsaastamoinen") {
-            name = "Mikael";
-            code = "G4LWYF";
-        } else { return; }
-        $('#All').html(`<h2 id="FinalHeader">${name}, se on tehty!</h2><div class="final">Lunasta 100 ED tällä fantastisella koodilla: <span class="blinking"> ${code}</span>
-            </div><div class="final">T: Pelinjohtotiimi</div><div class="final" id="ConfettiContainer"></div>`);
-        victorySound.play();
-        setInterval(showConfetti, 2000);
-    }
-
-    function showConfetti() {
-        function random(max) {
-            return Math.random() * (max - 0) + 0;
-        }
-
-        var c = document.createDocumentFragment();
-        for (var i = 0; i < 100; i++) {
-            var styles = 'transform: translate3d(' + (random(500) - 250) + 'px, ' + (random(200) - 150) + 'px, 0) rotate(' + random(360) + 'deg);\
-                        background: hsla('+ random(360) + ',100%,50%,1);\
-                        animation: bang 1500ms ease-out forwards;\
-                        opacity: 0';
-
-            var e = document.createElement("i");
-            e.style.cssText = styles.toString();
-            c.appendChild(e);
-        }
-        $('#ConfettiContainer').append(c);
-    }
-
     function dismissHackWarning() {
         $('#HackWarning, #HackSource').hide();
         fetch(serverUrl + "dismissWarning/" + currentUser);
@@ -612,6 +572,7 @@ $(function () {
         $('#HackLoader > div').removeClass('hack-loader');
     }
 
+    // Hacking timer update
     function clockTick() {
         var current = $('#Seconds').text();
         var newTick = parseInt(current) - 1;

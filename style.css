@@ -187,24 +187,10 @@ input {
     opacity: 1;
   }
 }
-#ConfettiContainer i {
-  position: absolute;
-  display: block;
-  left: 50%;
-  top: 0;
-  width: 3px;
-  height: 8px;
-  background: red;
-  opacity: 0;
-}
 #DismissWarningButton {
   position: absolute;
   top: 0;
   right: 0;
-}
-#ConfettiContainer {
-  position:relative;
-  width:100%;
 }
 .hack-loader {
   display: block;
