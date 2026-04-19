@@ -1,0 +1,1 @@
+This is a payment app made for a LARP game "Totentanz V: Final Night". It is shared with Attribution-NonCommercial license (CC BY-NC), so feel free to use it in your next game! Do note that the setup requires technical knowledge. This app requires a web server, Node.js server and a MySQL database to run. 
